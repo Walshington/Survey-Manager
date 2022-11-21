@@ -16,5 +16,12 @@ router.get("/api", (req, res) => {
     res.json({ message: "Hello from server!" });
 });
 
+/*LOGIN AND REGISTER */
+
+router.post('/login', function(req, res) {
+  res.send('home page');
+});
+
+
 
 module.exports = router;
