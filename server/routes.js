@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var sql = require('./config/db_config');
 
 //Middle ware that is specific to this router (example for now)
 router.use(function timeLog(req, res, next) {
@@ -13,7 +14,12 @@ router.get('/', function(req, res) {
 });
 
 router.get("/api", (req, res) => {
-    res.json({ message: "Hello from server!" });
+  sql.query('SELECT * FROM Persons', (err, rows, fields) => {
+    if (err) throw err;
+
+    console.log('Persons table data: ', rows);
+    res.json({row : rows[0].name});
+  })
 });
 
 /*LOGIN AND REGISTER */
@@ -21,7 +27,6 @@ router.get("/api", (req, res) => {
 router.post('/login', function(req, res) {
   res.send('home page');
 });
-
 
 
 module.exports = router;
