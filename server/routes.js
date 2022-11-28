@@ -13,12 +13,16 @@ router.get('/', function(req, res) {
   res.send('home page');
 });
 
-router.get("/api", (req, res) => {
-  sql.query('SELECT * FROM Persons', (err, rows, fields) => {
+router.post("/register", (req, res) => {
+  const req_name = req.body.name;
+  const req_email = req.body.email;
+  const req_pass = req.body.password;
+
+  sql.query('INSERT INTO users (name, email, password) as (req_name, req_email, req_pass)', (err, rows, fields) => {
     if (err) throw err;
 
-    console.log('Persons table data: ', rows);
-    res.json({row : rows[0].name});
+    console.log("we made it")
+    res.status(200).send('User successfully registered');
   })
 });
 
