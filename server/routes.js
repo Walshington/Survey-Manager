@@ -28,7 +28,7 @@ router.get("/users", (req, res) => {
 
 /*SURVEYS*/ 
 
-router.post("/survey", (req, res) => {
+router.post("/addsurvey", (req, res) => {
 
   res.set("Access-Control-Allow-Origin", "*");
   
@@ -49,6 +49,22 @@ router.post("/survey", (req, res) => {
     }
   );
   res.status(200).send("Survey successfully added");
+});
+
+router.post("/findsurvey", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_surveyID = req.body.surveyID;
+
+  sql.query(
+    "SELECT * FROM surveys WHERE id=?",
+    [req_surveyID],
+    (err, rows, fields) => {
+      if (err) throw err;
+      res.json(rows)
+    }
+  );
 });
 
 /*LOGIN AND REGISTER*/
