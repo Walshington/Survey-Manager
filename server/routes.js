@@ -27,7 +27,20 @@ router.get("/users", (req, res) => {
 });
 
 /*************** SURVEYS *****************/ 
-//create new survey
+
+/*
+{
+  "title":"testing participants and survey names",
+  "description":"walsh is testing",
+  "startDate":"2000-09-25",
+  "endDate":"2000-09-29",
+  "createdBy":"1",
+  "questions": ["questionwwwww1", "question2", "question3"],
+  "participants" : ["test@test.com", "testuser1@gmail.com", "testuser2@gmail.com"]
+}
+*/
+
+//create new survey and generate response tuples for participants
 router.post("/createsurvey", (req, res) => {
 
   res.set("Access-Control-Allow-Origin", "*");
@@ -66,6 +79,11 @@ router.post("/createsurvey", (req, res) => {
   );
 });
 
+/*
+{
+  "surveyID" : ""
+}
+*/
 //Finds single survey based on surveyID
 router.post("/getsurvey", (req, res) => {
 
@@ -82,6 +100,12 @@ router.post("/getsurvey", (req, res) => {
     }
   );
 });
+
+/*
+{
+  "userID" : ""
+}
+*/
 
 //Finds list of user created surveys based on userID (Lists all surveys for creator)
 router.post("/getcreatorsurveylist", (req, res) => {
@@ -100,6 +124,11 @@ router.post("/getcreatorsurveylist", (req, res) => {
   );
 });
 
+/*
+{
+  "email" : ""
+}
+*/
 //Finds list of user created surveys based on user email (Lists all surveys for participant)
 router.post("/getparticipantsurveylist", (req, res) => {
 
@@ -117,6 +146,11 @@ router.post("/getparticipantsurveylist", (req, res) => {
   );
 });
 
+/*
+{
+  "surveyID" : ""
+}
+*/
 //Deletes survey based on surveyID
 router.post("/deletesurvey", (req, res) => {
 
