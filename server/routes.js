@@ -58,13 +58,12 @@ router.post("/createsurvey", (req, res) => {
           [req.body.participants[i], surveyID, req_title, null, 0, null],
           (err, rows, fields) => {
             if (err) throw err;
+            res.status(200).send("Survey successfully added");
           }
         );
       }
     }
   );
-
-  res.status(200).send("Survey successfully added");
 });
 
 //Finds single survey based on surveyID
@@ -117,6 +116,34 @@ router.post("/getparticipantsurveylist", (req, res) => {
     }
   );
 });
+
+//Deletes survey based on surveyID
+router.post("/deletesurvey", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_surveyID = req.body.surveyID;
+
+  sql.query(
+    "DELETE FROM surveys WHERE id=?",
+    [req_surveyID],
+    (err, rows, fields) => {
+      if (err) throw err;
+    }
+  );
+
+  sql.query(
+    "DELETE FROM responses WHERE surveyID=?",
+    [req_surveyID],
+    (err, rows, fields) => {
+      if (err) throw err;
+    }
+  );
+
+  res.status(200).send("Survey and responses successfully deleted");
+});
+
+
 
 /*************** LOGIN AND REGISTER *****************/ 
 
