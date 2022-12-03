@@ -13,6 +13,19 @@ router.get("/", function (req, res) {
   res.send("home page");
 });
 
+/*USERS*/
+
+router.get("/users", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+
+  sql.query("SELECT * FROM users", (err, rows, fields) => {
+      if (err) throw err;
+      res.json(rows);
+    }
+  );
+});
+
 /*SURVEYS*/ 
 
 router.post("/survey", (req, res) => {
