@@ -13,7 +13,32 @@ router.get("/", function (req, res) {
   res.send("home page");
 });
 
-/*LOGIN AND REGISTER */
+/*SURVEYS*/ 
+
+router.post("/survey", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_id = req.body.userID;
+  const req_title = req.body.title;
+  const req_description = req.body.description;
+  const req_start_date = req.body.startDate;
+  const req_end_date = req.body.endDate;
+  const req_created_by = req.body.createdBy
+  const req_questions = JSON.stringify(req.body.questions); //Array
+
+  /* If data exists */
+  sql.query(
+    "INSERT INTO surveys (id, title, description, startDate, endDate, createdBy, questions) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [req_id, req_title, req_description, req_start_date, req_end_date, req_created_by, req_questions],
+    (err, rows, fields) => {
+      if (err) throw err;
+    }
+  );
+  res.status(200).send("Survey successfully added");
+});
+
+/*LOGIN AND REGISTER*/
 
 router.post("/register", (req, res) => {
   /* Need name, email, and password sent from clientside */
@@ -52,6 +77,7 @@ router.post("/login", function (req, res) {
 
       if (rows.length > 0) {
         /* Login the user */
+        req.currentUser = rows[0];
         res.status(200).send("User successfully logged in");
       } else {
         res.status(201).send("user not found");
