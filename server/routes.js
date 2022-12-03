@@ -13,32 +13,112 @@ router.get("/", function (req, res) {
   res.send("home page");
 });
 
-/*SURVEYS*/ 
+/*************** USERS *****************/ 
 
-router.post("/survey", (req, res) => {
+router.get("/users", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+
+  sql.query("SELECT * FROM users", (err, rows, fields) => {
+      if (err) throw err;
+      res.json(rows);
+    }
+  );
+});
+
+/*************** SURVEYS *****************/ 
+//create new survey
+router.post("/createsurvey", (req, res) => {
 
   res.set("Access-Control-Allow-Origin", "*");
   
-  const req_id = req.body.userID;
   const req_title = req.body.title;
   const req_description = req.body.description;
   const req_start_date = req.body.startDate;
   const req_end_date = req.body.endDate;
   const req_created_by = req.body.createdBy
   const req_questions = JSON.stringify(req.body.questions); //Array
+  const req_participants = JSON.stringify(req.body.participants) //Array storing email of every participant
 
-  /* If data exists */
   sql.query(
-    "INSERT INTO surveys (id, title, description, startDate, endDate, createdBy, questions) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [req_id, req_title, req_description, req_start_date, req_end_date, req_created_by, req_questions],
+    "INSERT INTO surveys (title, description, startDate, endDate, questions, participants, createdBy) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [req_title, req_description, req_start_date, req_end_date, req_questions, req_participants, req_created_by],
     (err, rows, fields) => {
       if (err) throw err;
+      surveyID = rows.insertId;
+  
+      /* after we grab json data we will loop through all emails and create response rows in database with status set to 0*/
+      /*0 because they are not answered*/
+
+      const len = req.body.participants.length;
+      for(i = 0; i < len; i++)
+      {
+        sql.query(
+          "INSERT INTO responses (email, surveyID, surveyName, responses, status, dateSubmitted) VALUES (?, ?, ?, ?, ?, ?)",
+          [req.body.participants[i], surveyID, req_title, null, 0, null],
+          (err, rows, fields) => {
+            if (err) throw err;
+          }
+        );
+      }
     }
   );
+
   res.status(200).send("Survey successfully added");
 });
 
-/*LOGIN AND REGISTER*/
+//Finds single survey based on surveyID
+router.post("/getsurvey", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_surveyID = req.body.surveyID;
+
+  sql.query(
+    "SELECT * FROM surveys WHERE id=?",
+    [req_surveyID],
+    (err, rows, fields) => {
+      if (err) throw err;
+      res.json(rows)
+    }
+  );
+});
+
+//Finds list of user created surveys based on userID (Lists all surveys for creator)
+router.post("/getcreatorsurveylist", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_userID = req.body.userID;
+
+  sql.query(
+    "SELECT * FROM surveys WHERE createdBy=?",
+    [req_userID],
+    (err, rows, fields) => {
+      if (err) throw err;
+      res.json(rows)
+    }
+  );
+});
+
+//Finds list of user created surveys based on user email (Lists all surveys for participant)
+router.post("/getparticipantsurveylist", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_email = req.body.email;
+
+  sql.query(
+    "SELECT * FROM responses WHERE email=?",
+    [req_email],
+    (err, rows, fields) => {
+      if (err) throw err;
+      res.json(rows)
+    }
+  );
+});
+
+/*************** LOGIN AND REGISTER *****************/ 
 
 router.post("/register", (req, res) => {
   /* Need name, email, and password sent from clientside */
