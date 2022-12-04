@@ -180,6 +180,15 @@ router.post("/deletesurvey", (req, res) => {
 
 /*************** RESPONSES *****************/ 
 
+/*
+{
+  "response" : ["question1" : 4, ],
+  "email" : "testuser1@gmail.com",
+  "surveyID" : 46,
+  "dateSubmitted" : "2000-09-25"
+}
+*/
+
 //Updates response fields after user responds to a survey
 router.post("/updateresponse", (req, res) => {
 
@@ -200,10 +209,58 @@ router.post("/updateresponse", (req, res) => {
   res.status(200).send("Survey response successfully updated");
 });
 
+/*
+{
+  "surveyID" : ""
+}
+*/
 
+//Creates a survey report
+router.post("/report", (req, res) => {
 
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_surveyID = req.body.surveyID;
+ 
+  sql.query(
+    "SELECT * FROM responses WHERE surveyID=? AND status=1",
+    [req_surveyID],
+    (err, rows, fields) => {
+      if (err) throw err;
+      const t1_answers = [];
+      const count = {1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0};
+      for(i = 0; i < rows.length; i++)
+      {
+        const answer = rows[i].response.question1;
+        t1_answers.push(answer);
+        //This will count how many occurences opf each answer we have
+        if(count[answer])
+        {
+          count[answer] += 1;
+        }
+        else
+        {
+          count[answer] = 1;
+        }
+      }
 
-/*************** LOGIN AND REGISTER *****************/ 
+      max = 0;
+      for(const answer in count)
+      {
+        if(count[answer] > max)
+        {
+          max = count[answer];
+          ans = answer;
+        }
+      }
+      mean = { answer : ans, mean : ((max/rows.length)*100).toFixed(0) };
+      response = { stats : mean, responses : rows}
+      res.json(response);
+    }
+  );
+});
+
+/*************** LOGIN AND REGISTER *****************/
 
 router.post("/register", (req, res) => {
   /* Need name, email, and password sent from clientside */
