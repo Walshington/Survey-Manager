@@ -34,7 +34,7 @@ router.get("/users", (req, res) => {
   "description":"walsh is testing",
   "startDate":"2000-09-25",
   "endDate":"2000-09-29",
-  "createdBy":"1",
+  "createdBy":"test@test.com",
   "questions": ["questionwwwww1", "question2", "question3"],
   "participants" : ["test@test.com", "testuser1@gmail.com", "testuser2@gmail.com"]
 }
@@ -67,14 +67,14 @@ router.post("/createsurvey", (req, res) => {
       for(i = 0; i < len; i++)
       {
         sql.query(
-          "INSERT INTO responses (email, surveyID, surveyName, responses, status, dateSubmitted) VALUES (?, ?, ?, ?, ?, ?)",
+          "INSERT INTO responses (email, surveyID, surveyName, response, status, dateSubmitted) VALUES (?, ?, ?, ?, ?, ?)",
           [req.body.participants[i], surveyID, req_title, null, 0, null],
           (err, rows, fields) => {
             if (err) throw err;
-            res.status(200).send("Survey successfully added");
           }
         );
       }
+      res.status(200).send("Survey successfully added");
     }
   );
 });
@@ -178,6 +178,30 @@ router.post("/deletesurvey", (req, res) => {
 });
 
 
+/*************** RESPONSES *****************/ 
+
+//Updates response fields after user responds to a survey
+router.post("/updateresponse", (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  
+  const req_response = JSON.stringify(req.body.response);
+  const req_email = req.body.email;
+  const req_surveyID = req.body.surveyID;
+  const req_date_submitted = req.body.dateSubmitted;
+ 
+  sql.query(
+    "UPDATE responses SET response=?, status=1, dateSubmitted=? WHERE email=? AND surveyID=?",
+    [req_response, req_date_submitted, req_email, req_surveyID],
+    (err, rows, fields) => {
+      if (err) throw err;
+    }
+  );
+  res.status(200).send("Survey response successfully updated");
+});
+
+
+
 
 /*************** LOGIN AND REGISTER *****************/ 
 
@@ -218,7 +242,6 @@ router.post("/login", function (req, res) {
 
       if (rows.length > 0) {
         /* Login the user */
-        req.currentUser = rows[0];
         res.status(200).send("User successfully logged in");
       } else {
         res.status(201).send("user not found");
