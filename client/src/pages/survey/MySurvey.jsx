@@ -7,55 +7,47 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useNavigate } from "react-router-dom";
 
-const SurveyCards = () => {
+const Responses = () => {
   const [surveys, setSurveys] = useState([]);
   const user = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const getUsers = async () => {
       const body = {
-        email: user.user.email,
+        userID: user.user.email,
       };
       try {
         const result = await axios.post(
-          "http://127.0.0.1:7777/getparticipantsurveylist",
+          "http://127.0.0.1:7777/getcreatorsurveylist",
           body
         );
-        const surveys = result.data.filter((x) => x.status === 0);
-        const a = Promise.all(
-          surveys.map(async (survey) => {
-            const x = await axios.post("http://127.0.0.1:7777/getsurvey", {
-              surveyID: survey.surveyID,
-            });
-            return x.data[0];
-          })
-        );
-        setSurveys((await a).filter((s) => new Date(s.endDate) >= new Date()));
+        console.log(result);
+
+        setSurveys(result.data);
       } catch (err) {
-        throw new Error("Error in survey index", err);
+        console.log(err);
       }
     };
     getUsers();
   }, [user.user.email]);
+
   console.log(surveys);
 
   return (
     <Container fixed sx={{ padding: "1rem", marginTop: "2rem" }}>
       {surveys.length !== 0 && (
         <Typography sx={{ marginBottom: "1rem" }} variant="h3">
-          Available Surveys
+          Your Survey Responses
         </Typography>
       )}
       {surveys.length === 0 && (
         <Typography sx={{ marginBottom: "1rem" }} variant="h3">
-          No Surveys Available
+          You have created no surveys
         </Typography>
       )}
       <Grid container spacing={2}>
-        {surveys.length !== 0 &&
+        {surveys &&
           surveys.map((survey) => (
             <Grid key={survey.id} item xs={12} sm={6} md={4}>
               <Card sx={{ minWidth: 275 }}>
@@ -73,12 +65,7 @@ const SurveyCards = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button
-                    onClick={() => navigate(`/surveys/${survey.id}`)}
-                    size="small"
-                  >
-                    Complete Survey
-                  </Button>
+                  <Button size="small">View Results</Button>
                 </CardActions>
               </Card>
             </Grid>
@@ -88,4 +75,4 @@ const SurveyCards = () => {
   );
 };
 
-export default SurveyCards;
+export default Responses;

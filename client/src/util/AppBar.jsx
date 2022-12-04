@@ -14,7 +14,7 @@ import PollIcon from "@mui/icons-material/Poll";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "./AuthProvider";
 
-const pages = ["Create"];
+const pages = ["Create", "My Surveys"];
 
 function TopMenuBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -85,7 +85,11 @@ function TopMenuBar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem href={page} key={page} onClick={handleCloseNavMenu}>
+                <MenuItem
+                  href={`/${page.split(" ").join("")}`}
+                  key={page}
+                  onClick={handleCloseNavMenu}
+                >
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -116,7 +120,7 @@ function TopMenuBar() {
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
-                href={page}
+                href={`/${page.split(" ").join("")}`}
               >
                 {page}
               </Button>

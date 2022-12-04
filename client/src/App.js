@@ -2,12 +2,13 @@ import React from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Landing from "./pages/user/Landing";
-import Survey from "./pages/survey";
 import { ProtectedRoute } from "./util/ProtectedRoute";
 import { AuthProvider } from "./util/AuthProvider";
 import TopMenuBar from "./util/AppBar";
-import CreateSurvey from "./pages/survey/Survey";
-import SurveyCreater from "./pages/survey/CreateSurvey";
+import CreateSurvey from "./pages/survey/CreateSurvey";
+import SurveyCards from "./pages/survey";
+import Responses from "./pages/survey/MySurvey";
+import CompleteSurvey from "./pages/survey/CompleteSurvey";
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
           element={
             <ProtectedRoute>
               <TopMenuBar />
-              <Survey />
+              <SurveyCards />
             </ProtectedRoute>
           }
         />
@@ -29,6 +30,24 @@ function App() {
             <ProtectedRoute>
               <TopMenuBar />
               <CreateSurvey />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mysurveys"
+          element={
+            <ProtectedRoute>
+              <TopMenuBar />
+              <Responses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/surveys/:id"
+          element={
+            <ProtectedRoute>
+              <TopMenuBar />
+              <CompleteSurvey />
             </ProtectedRoute>
           }
         />
