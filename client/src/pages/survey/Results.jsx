@@ -5,6 +5,7 @@ import { useAuth } from "../../util/AuthProvider";
 import { Container, Grid, Paper, Box, Button } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
+import { jsPDF } from "jspdf";
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -14,6 +15,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 function Results() {
   const [surv, setSurvey] = useState([]);
+  const [report, setReport] = useState([]);
   const param = useParams();
   const user = useAuth();
 
@@ -27,6 +29,8 @@ function Results() {
           "http://127.0.0.1:7777/getsurvey",
           body
         );
+        const report = await axios.post("http://127.0.0.1:7777/report", body);
+        console.log(report.data);
         setSurvey(result.data[0]);
       } catch (err) {
         console.log(err);
@@ -35,15 +39,55 @@ function Results() {
     getUsers();
   }, [param.id]);
 
-  async function SaveSurveyResults(json) {
-    const body = {
-      response: json,
-      email: user.user.email,
-      surveyID: surv.id,
-      dateSubmitted: new Date().toISOString().slice(0, 10),
-    };
-  }
-  console.log(surv);
+  const handleDownload = () => {
+    var doc = new jsPDF();
+
+    doc.setFontSize(20);
+    doc.setTextColor("blue");
+    doc.text("Survey Report", 105, 20, null, null, "center");
+    doc.setFontSize(16);
+    doc.setTextColor(0);
+    doc.text(`${surv.title}`, 105, 30, null, null, "center");
+    doc.setFontSize(14);
+    doc.text(`${surv.description}`, 105, 38, null, null, "center");
+    doc.text(
+      `Period: ${new Date(surv?.startDate)
+        .toISOString()
+        .slice(0, 10)} - ${new Date(surv?.endDate).toISOString().slice(0, 10)}`,
+      105,
+      45,
+      null,
+      null,
+      "center"
+    );
+    doc.text("Participants", 105, 55, null, null, "center");
+    let i = 65;
+    surv.participants.forEach((participant) => {
+      doc.text(`${participant}`, 105, i, null, null, "center");
+      i += 6;
+    });
+    i += 4;
+    doc.text("Questions", 105, i, null, null, "center");
+    i += 10;
+    surv.questions.forEach((question) => {
+      doc.text(`${question}`, 105, i, null, null, "center");
+      i += 6;
+    });
+    doc.setTextColor("blue");
+    doc.text("Type 1 Question", 105, (i += 4), null, null, "center");
+    doc.setTextColor(0);
+    doc.text("Mean: - Variance:", 105, (i += 6), null, null, "center");
+    doc.setTextColor("blue");
+    doc.text("Type 2 Questions", 105, (i += 10), null, null, "center");
+    doc.setTextColor(0);
+    doc.text("Text question 1", 105, (i += 6), null, null, "center");
+    doc.text("- Answer 1", 105, (i += 6), null, null, "center");
+    doc.text("- Answer 2", 105, (i += 6), null, null, "center");
+    doc.text("- Answer 3", 105, (i += 6), null, null, "center");
+
+    doc.save("report.pdf");
+  };
+
   let i = 0;
   return (
     surv.length !== 0 && (
@@ -56,7 +100,11 @@ function Results() {
             </Typography>
           </Grid>
           <Grid item xs={6} alignContent={"flex-end"}>
-            <Button sx={{ background: "#2c13ea" }} variant="contained">
+            <Button
+              onClick={() => handleDownload()}
+              sx={{ background: "#2c13ea" }}
+              variant="contained"
+            >
               Download Report
             </Button>
           </Grid>

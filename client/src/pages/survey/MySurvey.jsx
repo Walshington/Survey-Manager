@@ -37,6 +37,12 @@ const Responses = () => {
 
   console.log(surveys);
 
+  const handleDelete = (id) => {
+    try {
+      axios.post("http://127.0.0.1:7777/deletesurvey", { surveyID: id });
+    } catch (error) {}
+  };
+
   return (
     <Container fixed sx={{ padding: "1rem", marginTop: "2rem" }}>
       {surveys.length !== 0 && (
@@ -79,7 +85,7 @@ const Responses = () => {
                     >
                       View Results
                     </Button>
-                    <IconButton>
+                    <IconButton onClick={() => handleDelete(survey.id)}>
                       <DeleteIcon color="error"></DeleteIcon>
                     </IconButton>
                   </Box>
