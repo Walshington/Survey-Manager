@@ -226,10 +226,12 @@ router.post("/report", (req, res) => {
       if (err) throw err;
       const t1_answers = [];
       const count = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-      for (i = 0; i < rows.length; i++) {
+      rowLen = rows.length;
+      for (i = 0; i < rowLen; i++) {
         const answer = rows[i].response.question1;
         t1_answers.push(answer);
-        //This will count how many occurences opf each answer we have
+
+        //This will count how many occurences of each answer we have
         if (count[answer]) {
           count[answer] += 1;
         } else {
@@ -237,15 +239,15 @@ router.post("/report", (req, res) => {
         }
       }
 
-      max = 0;
+      percentArr = [];
       for (const answer in count) {
-        if (count[answer] > max) {
-          max = count[answer];
-          ans = answer;
-        }
+        //Building percentage object
+        percent = {};
+        percent["answer"] = answer;
+        percent["percentage"] = ((count[answer] / rowLen) * 100).toFixed(0);
+        percentArr.push(percent);
       }
-      mean = { answer: ans, mean: ((max / rows.length) * 100).toFixed(0) };
-      response = { stats: mean, responses: rows };
+      response = { stats: percentArr, responses: rows };
       res.json(response);
     }
   );
