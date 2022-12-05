@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Grid, Card } from "@mui/material";
+import { Container, Grid, Card, Box, IconButton } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../../util/AuthProvider";
 import * as React from "react";
@@ -7,10 +7,13 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { useNavigate } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Responses = () => {
   const [surveys, setSurveys] = useState([]);
   const user = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getUsers = async () => {
@@ -65,7 +68,21 @@ const Responses = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small">View Results</Button>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Button
+                      onClick={() => navigate(`/MySurvey/${survey.id}`)}
+                      size="small"
+                    >
+                      View Results
+                    </Button>
+                    <IconButton>
+                      <DeleteIcon color="error"></DeleteIcon>
+                    </IconButton>
+                  </Box>
                 </CardActions>
               </Card>
             </Grid>

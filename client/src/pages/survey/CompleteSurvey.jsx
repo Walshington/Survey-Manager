@@ -4,12 +4,14 @@ import { StylesManager, Model } from "survey-core";
 import axios from "axios";
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../../util/AuthProvider";
 
 StylesManager.applyTheme("defaultV2");
 
 function CompleteSurvey() {
   const [surv, setSurvey] = useState([]);
   const param = useParams();
+  const user = useAuth();
 
   useEffect(() => {
     const getUsers = async () => {
@@ -48,7 +50,13 @@ function CompleteSurvey() {
   };
 
   async function SaveSurveyResults(json) {
-    console.log(json);
+    const body = {
+      response: json,
+      email: user.user.email,
+      surveyID: surv.id,
+      dateSubmitted: new Date().toISOString().slice(0, 10),
+    };
+    await axios.post("http://127.0.0.1:7777/updateresponse", body);
   }
 
   const survey = new Model(surveyJson);

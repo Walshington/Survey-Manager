@@ -9,6 +9,7 @@ import CreateSurvey from "./pages/survey/CreateSurvey";
 import SurveyCards from "./pages/survey";
 import Responses from "./pages/survey/MySurvey";
 import CompleteSurvey from "./pages/survey/CompleteSurvey";
+import Results from "./pages/survey/Results";
 
 function App() {
   return (
@@ -48,6 +49,15 @@ function App() {
             <ProtectedRoute>
               <TopMenuBar />
               <CompleteSurvey />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mysurvey/:id"
+          element={
+            <ProtectedRoute>
+              <TopMenuBar />
+              <Results />
             </ProtectedRoute>
           }
         />
