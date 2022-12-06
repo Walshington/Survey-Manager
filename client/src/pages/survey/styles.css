@@ -1,0 +1,23 @@
+body {
+    background: #f1f2f4;
+  }
+  .App {
+    font-family: sans-serif;
+    text-align: center;
+  }
+  
+  .question {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .question .question-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  
+  .question .answer-options {
+    display: flex;
+  }

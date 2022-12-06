@@ -13,20 +13,18 @@ router.get("/", function (req, res) {
   res.send("home page");
 });
 
-/*************** USERS *****************/ 
+/*************** USERS *****************/
 
 router.get("/users", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
 
   sql.query("SELECT * FROM users", (err, rows, fields) => {
-      if (err) throw err;
-      res.json(rows);
-    }
-  );
+    if (err) throw err;
+    res.json(rows);
+  });
 });
 
-/*************** SURVEYS *****************/ 
+/*************** SURVEYS *****************/
 
 /*
 {
@@ -42,30 +40,36 @@ router.get("/users", (req, res) => {
 
 //create new survey and generate response tuples for participants
 router.post("/createsurvey", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
-  
+
   const req_title = req.body.title;
   const req_description = req.body.description;
   const req_start_date = req.body.startDate;
   const req_end_date = req.body.endDate;
-  const req_created_by = req.body.createdBy
+  const req_created_by = req.body.createdBy;
   const req_questions = JSON.stringify(req.body.questions); //Array
-  const req_participants = JSON.stringify(req.body.participants) //Array storing email of every participant
+  const req_participants = JSON.stringify(req.body.participants); //Array storing email of every participant
 
   sql.query(
     "INSERT INTO surveys (title, description, startDate, endDate, questions, participants, createdBy) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [req_title, req_description, req_start_date, req_end_date, req_questions, req_participants, req_created_by],
+    [
+      req_title,
+      req_description,
+      req_start_date,
+      req_end_date,
+      req_questions,
+      req_participants,
+      req_created_by,
+    ],
     (err, rows, fields) => {
       if (err) throw err;
       surveyID = rows.insertId;
-  
+
       /* after we grab json data we will loop through all emails and create response rows in database with status set to 0*/
       /*0 because they are not answered*/
 
       const len = req.body.participants.length;
-      for(i = 0; i < len; i++)
-      {
+      for (i = 0; i < len; i++) {
         sql.query(
           "INSERT INTO responses (email, surveyID, surveyName, response, status, dateSubmitted) VALUES (?, ?, ?, ?, ?, ?)",
           [req.body.participants[i], surveyID, req_title, null, 0, null],
@@ -86,9 +90,8 @@ router.post("/createsurvey", (req, res) => {
 */
 //Finds single survey based on surveyID
 router.post("/getsurvey", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
-  
+
   const req_surveyID = req.body.surveyID;
 
   sql.query(
@@ -96,7 +99,7 @@ router.post("/getsurvey", (req, res) => {
     [req_surveyID],
     (err, rows, fields) => {
       if (err) throw err;
-      res.json(rows)
+      res.json(rows);
     }
   );
 });
@@ -109,9 +112,8 @@ router.post("/getsurvey", (req, res) => {
 
 //Finds list of user created surveys based on userID (Lists all surveys for creator)
 router.post("/getcreatorsurveylist", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
-  
+
   const req_userID = req.body.userID;
 
   sql.query(
@@ -119,7 +121,7 @@ router.post("/getcreatorsurveylist", (req, res) => {
     [req_userID],
     (err, rows, fields) => {
       if (err) throw err;
-      res.json(rows)
+      res.json(rows);
     }
   );
 });
@@ -131,9 +133,8 @@ router.post("/getcreatorsurveylist", (req, res) => {
 */
 //Finds list of user created surveys based on user email (Lists all surveys for participant)
 router.post("/getparticipantsurveylist", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
-  
+
   const req_email = req.body.email;
 
   sql.query(
@@ -141,7 +142,7 @@ router.post("/getparticipantsurveylist", (req, res) => {
     [req_email],
     (err, rows, fields) => {
       if (err) throw err;
-      res.json(rows)
+      res.json(rows);
     }
   );
 });
@@ -153,9 +154,8 @@ router.post("/getparticipantsurveylist", (req, res) => {
 */
 //Deletes survey based on surveyID
 router.post("/deletesurvey", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
-  
+
   const req_surveyID = req.body.surveyID;
 
   sql.query(
@@ -177,8 +177,7 @@ router.post("/deletesurvey", (req, res) => {
   res.status(200).send("Survey and responses successfully deleted");
 });
 
-
-/*************** RESPONSES *****************/ 
+/*************** RESPONSES *****************/
 
 /*
 {
@@ -191,14 +190,13 @@ router.post("/deletesurvey", (req, res) => {
 
 //Updates response fields after user responds to a survey
 router.post("/updateresponse", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
-  
+
   const req_response = JSON.stringify(req.body.response);
   const req_email = req.body.email;
   const req_surveyID = req.body.surveyID;
   const req_date_submitted = req.body.dateSubmitted;
- 
+
   sql.query(
     "UPDATE responses SET response=?, status=1, dateSubmitted=? WHERE email=? AND surveyID=?",
     [req_response, req_date_submitted, req_email, req_surveyID],
@@ -217,45 +215,39 @@ router.post("/updateresponse", (req, res) => {
 
 //Creates a survey report
 router.post("/report", (req, res) => {
-
   res.set("Access-Control-Allow-Origin", "*");
-  
+
   const req_surveyID = req.body.surveyID;
- 
+
   sql.query(
     "SELECT * FROM responses WHERE surveyID=? AND status=1",
     [req_surveyID],
     (err, rows, fields) => {
       if (err) throw err;
       const t1_answers = [];
-      const count = {"1" : 0, "2" : 0, "3" : 0, "4" : 0, "5" : 0};
+      const count = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
       rowLen = rows.length;
-      for(i = 0; i < rowLen; i++)
-      {
+      for (i = 0; i < rowLen; i++) {
         const answer = rows[i].response.question1;
         t1_answers.push(answer);
 
         //This will count how many occurences of each answer we have
-        if(count[answer])
-        {
+        if (count[answer]) {
           count[answer] += 1;
-        }
-        else
-        {
+        } else {
           count[answer] = 1;
         }
       }
 
       percentArr = [];
-      for(const answer in count)
-      {
+      for (const answer in count) {
         //Building percentage object
         percent = {};
         percent["answer"] = answer;
-        percent["percentage"] = ((count[answer]/rowLen)*100).toFixed(0)
-        percentArr.push(percent)
+        percent["percentage"] = ((count[answer] / rowLen) * 100).toFixed(0);
+        percentArr.push(percent);
       }
-      response = { stats : percentArr, responses : rows}
+      response = { stats: percentArr, responses: rows };
       res.json(response);
     }
   );
