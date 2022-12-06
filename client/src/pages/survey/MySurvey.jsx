@@ -47,7 +47,7 @@ const Responses = () => {
     <Container fixed sx={{ padding: "1rem", marginTop: "2rem" }}>
       {surveys.length !== 0 && (
         <Typography sx={{ marginBottom: "1rem" }} variant="h3">
-          Your Survey Responses
+          Your Created Survey Responses
         </Typography>
       )}
       {surveys.length === 0 && (
@@ -57,7 +57,7 @@ const Responses = () => {
       )}
       <Grid container spacing={2}>
         {surveys &&
-          surveys.map((survey) => (
+          surveys?.map((survey) => (
             <Grid key={survey.id} item xs={12} sm={6} md={4}>
               <Card sx={{ minWidth: 275 }}>
                 <CardContent>

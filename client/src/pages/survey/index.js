@@ -41,6 +41,7 @@ const SurveyCards = () => {
     getUsers();
   }, [user.user.email]);
   console.log(surveys);
+  console.log(user.user.email);
 
   return (
     <Container fixed sx={{ padding: "1rem", marginTop: "2rem" }}>
@@ -56,7 +57,7 @@ const SurveyCards = () => {
       )}
       <Grid container spacing={2}>
         {surveys.length !== 0 &&
-          surveys.map((survey) => (
+          surveys?.map((survey) => (
             <Grid key={survey.id} item xs={12} sm={6} md={4}>
               <Card sx={{ minWidth: 275 }}>
                 <CardContent>

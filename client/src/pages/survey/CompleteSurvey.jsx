@@ -31,7 +31,7 @@ function CompleteSurvey() {
     getUsers();
   }, [param.id]);
 
-  console.log(surv);
+  console.log("THIS IS SURVEY", surv);
   const surveyJson = {
     title: surv.title,
     description: surv.description,

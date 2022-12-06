@@ -15,7 +15,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 function Results() {
   const [surv, setSurvey] = useState([]);
-  const [report, setReport] = useState([]);
+  const [responses, setResponses] = useState([]);
+  const [stats, setStats] = useState([]);
   const param = useParams();
   const user = useAuth();
 
@@ -30,7 +31,9 @@ function Results() {
           body
         );
         const report = await axios.post("http://127.0.0.1:7777/report", body);
-        console.log(report.data);
+        console.log(report.data.stats);
+        setResponses(report.data.responses);
+        setStats(report.data.stats);
         setSurvey(result.data[0]);
       } catch (err) {
         console.log(err);
@@ -39,6 +42,7 @@ function Results() {
     getUsers();
   }, [param.id]);
 
+  // ((0.67*3*4)+(0.33*3*3))/3
   const handleDownload = () => {
     var doc = new jsPDF();
 
@@ -67,27 +71,64 @@ function Results() {
       i += 6;
     });
     i += 4;
-    doc.text("Questions", 105, i, null, null, "center");
+    doc.text("Survey Questions", 105, i, null, null, "center");
     i += 10;
     surv.questions.forEach((question) => {
-      doc.text(`${question}`, 105, i, null, null, "center");
+      doc.text(`${question.title}`, 105, i, null, null, "center");
       i += 6;
     });
     doc.setTextColor("blue");
     doc.text("Type 1 Question", 105, (i += 4), null, null, "center");
     doc.setTextColor(0);
-    doc.text("Mean: - Variance:", 105, (i += 6), null, null, "center");
+    let mean = 0;
+    stats.forEach((s) => {
+      mean += (s.percentage / 100) * responses.length * s.answer;
+    });
+    mean /= responses.length;
+    doc.text(`Mean: ${mean.toFixed(2)}`, 105, (i += 6), null, null, "center");
+    doc.text(`Answer Distribution`, 105, (i += 6), null, null, "center");
+    stats.forEach((s) => {
+      doc.text(
+        `${s.answer}  -  ${s.percentage}%`,
+        95,
+        (i += 6),
+        null,
+        null,
+        "justify"
+      );
+    });
+    doc.addPage("a4");
+    i = 10;
     doc.setTextColor("blue");
     doc.text("Type 2 Questions", 105, (i += 10), null, null, "center");
     doc.setTextColor(0);
     doc.text("Text question 1", 105, (i += 6), null, null, "center");
-    doc.text("- Answer 1", 105, (i += 6), null, null, "center");
-    doc.text("- Answer 2", 105, (i += 6), null, null, "center");
-    doc.text("- Answer 3", 105, (i += 6), null, null, "center");
+    responses.forEach((r) => {
+      doc.text(
+        `- ${r.response.question2}`,
+        105,
+        (i += 6),
+        null,
+        null,
+        "center"
+      );
+    });
+
+    doc.text("Text question 2", 105, (i += 10), null, null, "center");
+    responses.forEach((r) => {
+      doc.text(
+        `- ${r.response.question3}`,
+        105,
+        (i += 6),
+        null,
+        null,
+        "center"
+      );
+    });
 
     doc.save("report.pdf");
   };
-
+  console.log(surv);
   let i = 0;
   return (
     surv.length !== 0 && (
@@ -129,7 +170,7 @@ function Results() {
             <Grid item xs={12}>
               {surv.questions.map((survey) => (
                 <Item key={i++} elevation={0}>
-                  {survey}
+                  {survey.title}
                 </Item>
               ))}
             </Grid>
