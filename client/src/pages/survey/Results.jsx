@@ -100,12 +100,13 @@ function Results() {
     doc.addPage("a4");
     i = 10;
     doc.setTextColor("blue");
-    doc.text("Type 2 Questions", 105, (i += 10), null, null, "center");
+    doc.text("Type 2 Question Answers", 105, (i += 10), null, null, "center");
     doc.setTextColor(0);
     doc.text("Text question 1", 105, (i += 6), null, null, "center");
+    let z = 0;
     responses.forEach((r) => {
       doc.text(
-        `- ${r.response.question2}`,
+        `${++z} - ${r.response.question2}`,
         105,
         (i += 6),
         null,
@@ -115,9 +116,10 @@ function Results() {
     });
 
     doc.text("Text question 2", 105, (i += 10), null, null, "center");
+    z = 0;
     responses.forEach((r) => {
       doc.text(
-        `- ${r.response.question3}`,
+        `${++z} - ${r.response.question3}`,
         105,
         (i += 6),
         null,

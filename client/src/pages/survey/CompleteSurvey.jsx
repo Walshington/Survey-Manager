@@ -31,7 +31,6 @@ function CompleteSurvey() {
     getUsers();
   }, [param.id]);
 
-  console.log("THIS IS SURVEY", surv);
   const surveyJson = {
     title: surv.title,
     description: surv.description,
@@ -49,22 +48,45 @@ function CompleteSurvey() {
     }),
   };
 
-  async function SaveSurveyResults(json) {
+  // async function SaveSurveyResults(json) {
+  //   const body = {
+  //     response: json,
+  //     email: user.user.email,
+  //     surveyID: surv.id,
+  //     dateSubmitted: new Date().toISOString().slice(0, 10),
+  //   };
+  //   const res = await axios.post("http://127.0.0.1:7777/updateresponse", body);
+
+  // }
+
+  const survey = new Model(surveyJson);
+  survey.onComplete.add(async function (sender, options) {
+    const json = sender.data;
     const body = {
       response: json,
       email: user.user.email,
       surveyID: surv.id,
       dateSubmitted: new Date().toISOString().slice(0, 10),
     };
-    await axios.post("http://127.0.0.1:7777/updateresponse", body);
-  }
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:7777/updateresponse",
+        body
+      );
+      console.log(res);
+      if (res.status === 200) {
+        options.showDataSavingSuccess();
+      } else {
+        options.showDataSavingError();
+        throw new Error("Failed to submit survey");
+      }
+    } catch (error) {}
+  });
+  // const surveyComplete = useCallback((sender) => {
+  //   SaveSurveyResults(sender.data);
+  // }, []);
 
-  const survey = new Model(surveyJson);
-  const surveyComplete = useCallback((sender) => {
-    SaveSurveyResults(sender.data);
-  }, []);
-
-  survey.onComplete.add(surveyComplete);
+  // survey.onComplete.add(surveyComplete);
 
   return <Survey model={survey} />;
 }
